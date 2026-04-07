@@ -1,0 +1,133 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Catering System</title>
+
+<style>
+body {font-family: Arial; text-align:center;}
+input, select {padding:8px; margin:5px;}
+button {padding:10px; background:orange; color:white; border:none;}
+table {width:90%; margin:auto; border-collapse:collapse;}
+th, td {border:1px solid #000; padding:5px;}
+</style>
+</head>
+
+<body>
+
+<h2>Booking Form</h2>
+
+<input type="text" id="name" placeholder="नाम"><br>
+<input type="text" id="mobile" placeholder="मोबाइल"><br>
+<input type="date" id="date"><br>
+<select id="time">
+<option>सुबह</option>
+<option>शाम</option>
+</select><br>
+<input type="number" id="people" placeholder="लोग"><br>
+
+<button onclick="saveData()">Save</button>
+<button onclick="refreshPage()">Refresh</button>
+
+<h2>Data</h2>
+
+<table>
+<tr>
+<th>Select</th>
+<th>नाम</th>
+<th>मोबाइल</th>
+<th>तारीख</th>
+<th>समय</th>
+<th>लोग</th>
+<th>WhatsApp</th>
+</tr>
+<tbody id="dataTable"></tbody>
+</table>
+
+<br>
+<button onclick="deleteSelected()">Delete Selected</button>
+
+<h3 id="report"></h3>
+
+<script>
+
+function saveData() {
+
+var name = document.getElementById("name").value;
+var mobile = document.getElementById("mobile").value;
+var date = document.getElementById("date").value;
+var time = document.getElementById("time").value;
+var people = document.getElementById("people").value;
+
+if(name=="" || mobile=="") {
+alert("नाम और मोबाइल जरूरी है");
+return;
+}
+
+var data = JSON.parse(localStorage.getItem("data")) || [];
+data.push({name:name, mobile:mobile, date:date, time:time, people:people});
+localStorage.setItem("data", JSON.stringify(data));
+
+var msg = "नाम: "+name+"%0Aमोबाइल: "+mobile+"%0Aतारीख: "+date+"%0Aसमय: "+time+"%0Aलोग: "+people;
+window.open("https://wa.me/91XXXXXXXXXX?text="+msg);
+
+showData();
+}
+
+function showData() {
+
+var data = JSON.parse(localStorage.getItem("data")) || [];
+var table = document.getElementById("dataTable");
+table.innerHTML="";
+
+var total=0;
+
+for(var i=0;i<data.length;i++) {
+
+var d = data[i];
+total += Number(d.people||0);
+
+var msg = "नाम: "+d.name+"%0Aमोबाइल: "+d.mobile+"%0Aतारीख: "+d.date+"%0Aसमय: "+d.time+"%0Aलोग: "+d.people;
+
+table.innerHTML += "<tr>"+
+"<td><input type='checkbox' class='chk'></td>"+
+"<td>"+d.name+"</td>"+
+"<td>"+d.mobile+"</td>"+
+"<td>"+d.date+"</td>"+
+"<td>"+d.time+"</td>"+
+"<td>"+d.people+"</td>"+
+"<td><a href='https://wa.me/"+d.mobile+"?text="+msg+"' target='_blank'>Send</a></td>"+
+"</tr>";
+}
+
+document.getElementById("report").innerHTML =
+"कुल बुकिंग: "+data.length+" | कुल लोग: "+total;
+}
+
+function deleteSelected() {
+
+var data = JSON.parse(localStorage.getItem("data")) || [];
+var checks = document.getElementsByClassName("chk");
+
+var newData = [];
+
+for(var i=0;i<checks.length;i++) {
+if(!checks[i].checked) {
+newData.push(data[i]);
+}
+}
+
+localStorage.setItem("data", JSON.stringify(newData));
+showData();
+}
+
+function refreshPage() {
+location.reload();
+}
+
+showData();
+
+</script>
+
+</body>
+</html>
